@@ -29,10 +29,11 @@
     },
     methods:{
       register () {
+        this.$router.push({name: 'Login',params: { isLogin:false}});
 
       },
       login () {
-        this.$router.push({path: '/login'});
+        this.$router.push({name: 'Login',params: { isLogin:true}});
       }
     }
   }

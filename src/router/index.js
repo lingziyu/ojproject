@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/views/Home'
 import History from '@/views/History'
 import Login from '@/views/Login'
+import Problem from '@/views/Problem'
 Vue.use(Router);
 
 export default new Router({
@@ -16,9 +17,13 @@ export default new Router({
       name: 'History',
       component: History
     },{
-      path: '/login',
+      path: '/login/:isLogin',
       name: 'Login',
       component: Login
+    },{
+      path: '/problem',
+      name: 'Problem',
+      component: Problem
     }
   ]
 })

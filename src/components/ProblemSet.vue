@@ -21,7 +21,7 @@
       return {
         noVerticalBorder:false,
         tableData: [
-          {"isWritten": true, "index":1,"title": "两数之和", "passRate": "50", "difficultLevel": "0","url":"http://www.baidu.com"},
+          {"isWritten": true, "index":1,"title": "两数之和", "passRate": "50", "difficultLevel": "0","url":"#/problem"},
           {"isWritten": false,"index":2, "title": "两数相加", "passRate": "38", "difficultLevel": "1","url":"www.baidu.com"},
           {"isWritten": true, "index":3,"title": "无重复字符的最长子串", "passRate": "16", "difficultLevel": "2","url":"www.baidu.com"},
           {"isWritten": false,"index":4, "title": "删除链表的倒数第N个节点", "passRate": "13", "difficultLevel": "0","url":"www.baidu.com"},
