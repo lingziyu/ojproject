@@ -6,6 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: {
+      role:0,
       token: '',
       uid: ''
     }
@@ -16,6 +17,9 @@ export default new Vuex.Store({
     },
     setUID(state,uid){
       state.user.uid = uid;
+    },
+    setRole(state,role){
+      state.user.role = role;
     },
     reset(){
       state.token = '';

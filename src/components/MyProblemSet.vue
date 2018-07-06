@@ -24,46 +24,46 @@
         url: server.url + '/api/result',
         noVerticalBorder: false,
         tableData: [
-          {
-            "submitTime": "2 小时，55 分钟",
-            "pname": "两数之和",
-            "status": 4,
-            "time": 165,
-            "language": "cpp",
-            "pid": "1"
-          },
-          {
-            "submitTime": "1 小时，55 分钟",
-            "pname": "两数相加",
-            "status": 3,
-            "time": 33,
-            "language": "cpp",
-            "pid": "1"
-          },
-          {
-            "submitTime": "3 小时，55 分钟",
-            "pname": "无重复字符的最长子串",
-            "status": 3,
-            "time": 23,
-            "language": "cpp",
-            "pid": "1"
-          },
-          {
-            "submitTime": "2 小时，55 分钟",
-            "pname": "删除链表的倒数第N个节点",
-            "status": 3,
-            "time": 323,
-            "language": "cpp",
-            "pid": "1"
-          },
-          {
-            "submitTime": "2 小时，55 分钟",
-            "pname": "与所有单词相关联的字串",
-            "status": 4,
-            "time": 233,
-            "language": "cpp",
-            "pid": "1"
-          }
+          // {
+          //   "submitTime": "2 小时，55 分钟",
+          //   "pname": "两数之和",
+          //   "status": 4,
+          //   "time": 165,
+          //   "language": "cpp",
+          //   "pid": "1"
+          // },
+          // {
+          //   "submitTime": "1 小时，55 分钟",
+          //   "pname": "两数相加",
+          //   "status": 3,
+          //   "time": 33,
+          //   "language": "cpp",
+          //   "pid": "1"
+          // },
+          // {
+          //   "submitTime": "3 小时，55 分钟",
+          //   "pname": "无重复字符的最长子串",
+          //   "status": 3,
+          //   "time": 23,
+          //   "language": "cpp",
+          //   "pid": "1"
+          // },
+          // {
+          //   "submitTime": "2 小时，55 分钟",
+          //   "pname": "删除链表的倒数第N个节点",
+          //   "status": 3,
+          //   "time": 323,
+          //   "language": "cpp",
+          //   "pid": "1"
+          // },
+          // {
+          //   "submitTime": "2 小时，55 分钟",
+          //   "pname": "与所有单词相关联的字串",
+          //   "status": 4,
+          //   "time": 233,
+          //   "language": "cpp",
+          //   "pid": "1"
+          // }
         ],
         columns: [
 
@@ -87,9 +87,11 @@
             titleAlign: 'left',
             columnAlign: 'left',
             formatter: function (rowData, rowIndex, pagingIndex, field) {
-              let color = "#67C23A";
+              let color = "#E6A23C";
               if (rowData.status === 4) {
                 color = "#F56C6C";
+              }else if(rowData.status === 3){
+                color = '#67C23A'
               }
               let status = "";
               switch(rowData.status){

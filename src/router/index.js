@@ -4,6 +4,8 @@ import Home from '@/views/Home'
 import History from '@/views/History'
 import Login from '@/views/Login'
 import Problem from '@/views/Problem'
+import AdminHome from '@/views/AdminHome'
+import AdminProblem from '@/views/AdminProblem'
 import store from '../store'
 Vue.use(Router);
 
@@ -16,6 +18,20 @@ const router = new Router({
         requireAuth: true
       },
       component: Home
+    },{
+      path: '/adminhome',
+      name: 'AdminHome',
+      meta: {
+        requireAuth: true
+      },
+      component: AdminHome
+    },{
+      path: '/adminproblem/:pid',
+      name: 'AdminProblem',
+      meta: {
+        requireAuth: true
+      },
+      component: AdminProblem
     },{
       path: '/history',
       name: 'History',
@@ -46,6 +62,7 @@ router.beforeEach((to, from, next) => {
     else if(sessionStorage.token){
       store.state.user.token = sessionStorage.token;
       store.state.user.uid = sessionStorage.uid;
+      store.state.user.role = sessionStorage.role;
       next()
     }
     else {// 没登录则跳转到登录界面

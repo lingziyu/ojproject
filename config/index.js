@@ -5,7 +5,9 @@
 const path = require('path')
 
 module.exports = {
-  url: 'http://localhost:8011',
+  // url: 'http://localhost:8011',
+  url: 'http://180.160.30.103:8011',
+
   dev: {
 
     // Paths

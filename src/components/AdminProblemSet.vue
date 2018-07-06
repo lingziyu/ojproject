@@ -1,5 +1,6 @@
 <template>
-  <div class="problem-set">
+  <div class="admin-problem-set">
+    <el-button style="margin-bottom: 20px;margin-left: 20px" size="small" type="primary" icon="el-icon-plus" @click="addCase"></el-button>
 
     <v-table
       is-horizontal-resize
@@ -10,6 +11,7 @@
       row-click-color="#edf7ff"
       even-bg-color="#f4f4f4"
       :show-vertical-border="noVerticalBorder"
+      @on-custom-comp="customCompFunc"
     ></v-table>
   </div>
 </template>
@@ -20,32 +22,16 @@
   import server from '../../config/index';
 
   export default {
-    name: 'ProblemSet',
+    name: 'AdminProblemSet',
     data() {
       return {
         url: server.url + '/api/problem',
         userUrl: server.url + '/api/user',
         noVerticalBorder: false,
         passProblems: [],
-        tableData: [
-          // {"isWritten": true, "pid": "1", "pname": "两数之和", "passRate": "50", "difficulty": "0"},
-          // {"isWritten": false, "pid": "2", "pname": "两数相加", "passRate": "38", "difficulty": "1"},
-          // {"isWritten": true, "pid": "3", "pname": "无重复字符的最长子串", "passRate": "16", "difficulty": "2"},
-          // {"isWritten": false, "pid": "4", "pname": "删除链表的倒数第N个节点", "passRate": "13", "difficulty": "0"},
-          // {"isWritten": false, "pid": "5", "pname": "与所有单词相关联的字串", "passRate": "18", "difficulty": "2"}
-        ],
+        tableData: [],
         columns: [
-
-          {
-            field: 'isWritten',
-            title: '',
-            width: 10,
-            titleAlign: 'center',
-            columnAlign: 'center',
-            componentName: 'is-written-cell',
-            isResize: true
-          },
-          {field: 'pid', title: '#', width: 10, titleAlign: 'left', columnAlign: 'left', isResize: true},
+          {field: 'pid', title: '#', width: 20, titleAlign: 'center', columnAlign: 'center', isResize: true},
           {
             field: 'pname',
             title: '题名',
@@ -54,7 +40,7 @@
             columnAlign: 'left',
             isResize: true,
             formatter: function (rowData, rowIndex, pagingIndex, field) {
-              return '<a style="color:#08c;text-decoration: none;"  href="#/problem/' + rowData.pid + '">' + rowData.pname + '</a>'
+              return '<a style="color:#08c;text-decoration: none;"  href="#/adminproblem/' + rowData.pid + '">' + rowData.pname + '</a>'
             },
           },
           {
@@ -75,9 +61,40 @@
             columnAlign: 'center',
             componentName: 'difficult-level-cell',
             isResize: true,
+          },
+          {
+            field: 'custome-adv',
+            title: '',
+            width: 200,
+            titleAlign: 'center',
+            columnAlign: 'center',
+            componentName: 'table-operation',
+            isResize: true,
           }
 
         ]
+      }
+    },
+    methods: {
+      addCase(){
+
+      },
+      customCompFunc(params) {
+
+        // console.log(params);
+
+        if (params.type === 'delete') { // do delete operation
+
+          this.$delete(this.tableData, params.index);
+
+        } else if (params.type === 'edit') { // do edit operation
+
+          // alert(`行号：${params.index} 姓名：${params.rowData['pid']}`)
+          this.$router.push({name: 'AdminProblem', params: {pid: params.rowData['pid']}});
+
+        }
+
+
       }
     },
     mounted() {
@@ -122,7 +139,7 @@
             }
             if (this.passProblems.length !== 0) {
               for (let i = 0; i < this.tableData.length; i++) {
-                this.tableData[i].isWritten =  (this.passProblems.indexOf(this.tableData[i].pid) !== -1);
+                this.tableData[i].isWritten = (this.passProblems.indexOf(this.tableData[i].pid) !== -1);
               }
             }
 
@@ -138,50 +155,37 @@
       });
     }
   }
-
-
   // 自定义列组件
-  Vue.component('DifficultLevelCell', {
+  //<a style="text-decoration: none;color: #409EFF;" href="#/editproblem/` + this.rowData + `">编辑</a>
+  Vue.component('table-operation', {
     template: `<span>
-        <el-tag v-if="success" type="success">简单</el-tag>
-        <el-tag v-if="warning" type="warning">中等</el-tag>
-        <el-tag v-if="danger" type="danger">困难</el-tag>
+        <a style="text-decoration: none;color: #409EFF;" href="" @click.stop.prevent="update(rowData,index)">编辑</a>
+        <a style="text-decoration: none;color: #409EFF;" href="" @click.stop.prevent="deleteRow(rowData,index)">删除</a>
         </span>`,
     props: {
       rowData: {
         type: Object
       },
+      index: {
+        type: Number
+      },
     },
-    computed: {
-      success: function () {
-        return this.rowData.difficulty === 0;
+    methods: {
+      update() {
+        // 参数根据业务场景随意构造
+        let params = {type: 'edit', index: this.index, rowData: this.rowData};
+        this.$emit('on-custom-comp', params);
       },
-      warning: function () {
-        return this.rowData.difficulty === 1;
-      },
-      danger: function () {
-        return this.rowData.difficulty === 2;
+
+      deleteRow() {
+        // 参数根据业务场景随意构造
+        let params = {type: 'delete', index: this.index};
+        this.$emit('on-custom-comp', params);
+
       }
-    },
+    }
   })
 
-  // 自定义列组件
-  Vue.component('isWrittenCell', {
-    template: `<span>
-        <i v-if="isWritten" class="el-icon-check" style="color: #67C23A"></i>
-        </span>`,
-    props: {
-      rowData: {
-        type: Object
-      },
-    },
-    computed: {
-      isWritten: function () {
-        return this.rowData.isWritten;
-      },
-
-    },
-  })
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

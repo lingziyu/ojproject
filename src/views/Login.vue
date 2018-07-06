@@ -42,6 +42,10 @@
                 <el-button v-if="isLogin" type="primary" class="main-btn" @click="onLogin">登录</el-button>
                 <el-button v-else type="primary" class="main-btn" @click="onRegister">注册</el-button>
               </el-form-item>
+              <el-form-item class="arrow">
+                <a type="primary" href="#/login/false" icon="el-icon-arrow-left" v-if="isLogin"><i class="el-icon-back"></i>&nbsp;没有账号，注册</a>
+                <a type="primary" href="#/login/true" icon="el-icon-arrow-left" v-else><i class="el-icon-back"></i>&nbsp;已有账号，登录</a>
+              </el-form-item>
             </el-form>
           </div>
         </el-col>
@@ -66,7 +70,6 @@
     name: 'Login',
     components: {
       MyHeader,
-
     },
     computed: {
       isLogin: function () {
@@ -161,8 +164,10 @@
                 type: 'success'
               });
               this.$store.commit('setToken', response.data.token);
+              this.$store.commit('setRole',response.data.role);
               this.$store.commit('setUID', this.loginForm.uid);
               sessionStorage.setItem('token', response.data.token);
+              this.$store.commit('setRole',response.data.role);
               sessionStorage.setItem('uid', this.loginForm.uid);
               this.$router.push('/history');
             }
@@ -234,6 +239,11 @@
 
   .left-page {
     padding: 20px;
+  }
+
+  .arrow >>> a{
+    text-decoration: none;
+    color: #409EFF;;
   }
 </style>
 

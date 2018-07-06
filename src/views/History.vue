@@ -18,7 +18,7 @@
     }
   }
 </script>
-<style>
+<style scoped>
   .title{
     margin-left: 20px;
   }

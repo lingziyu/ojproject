@@ -12,6 +12,7 @@ axios.interceptors.request.use(
     else if(sessionStorage.token){
       store.state.user.token = sessionStorage.token;
       store.state.user.uid = sessionStorage.uid;
+      store.state.user.role = sessionStorage.role;
       config.headers.Authorization = `${store.state.user.token}`;
     }
     return config;
