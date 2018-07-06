@@ -7,34 +7,40 @@
           <div class="grid-content left-page">
             <h1 v-if="isLogin">登录</h1>
             <h1 v-else>注册</h1>
-            <el-form class="login-form" label-position="top" label-width="80px" :model="loginForm">
+            <el-form class="login-form" label-position="top" label-width="80px" :model="loginForm" status-icon
+                     :rules="rules2">
               <el-form-item>
                 <el-input
                   placeholder="账号"
                   type="text"
-                  v-model="loginForm.userId"
+                  v-model="loginForm.uid"
                   clearable>
                 </el-input>
               </el-form-item>
-              <el-form-item>
+              <el-form-item v-if="isLogin">
                 <el-input
                   placeholder="密码"
                   v-model="loginForm.password"
-                  type="password"
-                  clearable>
+                  type="password">
                 </el-input>
               </el-form-item>
-              <el-form-item v-if="!isLogin">
+              <el-form-item v-if="!isLogin" prop="password">
+                <el-input
+                  placeholder="密码"
+                  v-model="loginForm.password"
+                  type="password">
+                </el-input>
+              </el-form-item>
+              <el-form-item v-if="!isLogin" prop="checkPass">
                 <el-input
                   placeholder="确认密码"
-                  v-model="loginForm.password"
-                  type="password"
-                  clearable>
+                  v-model="loginForm.checkPass"
+                  type="password">
                 </el-input>
               </el-form-item>
               <el-form-item>
-                <el-button v-if="isLogin" type="primary" class="main-btn" @click="onSubmit()">登录</el-button>
-                <el-button v-else type="primary" class="main-btn" @click="onSubmit()">注册</el-button>
+                <el-button v-if="isLogin" type="primary" class="main-btn" @click="onLogin">登录</el-button>
+                <el-button v-else type="primary" class="main-btn" @click="onRegister">注册</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -52,6 +58,9 @@
 <script>
   // @ is an alias to /src
   import MyHeader from "../components/MyHeader";
+  import axios from '../axios/http';
+  import server from '../../config/index';
+
 
   export default {
     name: 'Login',
@@ -65,20 +74,118 @@
       }
     },
     data() {
+      var validatePass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else {
+          if (this.loginForm.checkPass !== '') {
+            this.$refs.loginForm.validateField('checkPass');
+          }
+          callback();
+        }
+      };
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.loginForm.password) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
       return {
+        url: server.url + '/api/user',
         loginForm: {
-          userId: "",
-          password: ""
+          uid: "",
+          password: "",
+          checkPass: ""
+        },
+        rules2: {
+          password: [
+            {validator: validatePass, trigger: 'blur'}
+          ],
+          checkPass: [
+            {validator: validatePass2, trigger: 'blur'}
+          ]
         }
       }
     },
     mounted() {
 
     },
-    method: {
-      onSubmit() {
+    methods: {
+      onRegister: function () {
+        axios.post(this.url + '/register', {
+          "uid": this.loginForm.uid,
+          "password": this.loginForm.password,
+          "isManager": false
+        }).then(response => {
+            if (response.status !== 200) {
+              throw response;
+            }
+            else {
+              this.$message({
+                message: '注册成功',
+                type: 'success'
+              });
+              this.$store.commit('setToken', response.data.token);
+              this.$store.commit('setUID', this.loginForm.uid);
+              sessionStorage.setItem('token', response.data.token);
+              sessionStorage.setItem('uid', this.loginForm.uid);
+              this.$router.push('/history');
+            }
+          }
+        ).catch((error) => {
+          if(error.response) {
+            switch (error.response.status) {
+              case 404:
+                this.$message.error('用户名已存在');
+                break;
+              default:
+                this.$message.error('未知错误');
+            }
+          }
+          else{
+            console.log(error);
+          }
+        });
+      },
+      onLogin: function () {
+        axios.post(this.url + '/login', this.loginForm).then(response => {
+            if (response.status !== 200) {
+              throw response;
+            }
+            else {
+              this.$message({
+                message: '登陆成功',
+                type: 'success'
+              });
+              this.$store.commit('setToken', response.data.token);
+              this.$store.commit('setUID', this.loginForm.uid);
+              sessionStorage.setItem('token', response.data.token);
+              sessionStorage.setItem('uid', this.loginForm.uid);
+              this.$router.push('/history');
+            }
+          }
+        ).catch((error) => {
+          if (error.response) {
+            switch (error.response.status) {
+              case 401:
+                this.$message.error('密码错误');
+                break;
+              case 404:
+                this.$message.error('用户不存在');
+                break;
+              default:
+                this.$message.error('未知错误');
+            }
+          }
+          else{
+            console.log(error);
+          }
+        });
+      },
 
-      }
     }
   }
 </script>

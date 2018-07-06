@@ -1,5 +1,5 @@
 <template>
-  <div class="problem-set" >
+  <div class="problem-set">
     <v-table
       is-horizontal-resize
       style="width:100%"
@@ -15,17 +15,23 @@
 
 <script>
   import Vue from 'vue'
+  import axios from '../axios/http';
+  import server from '../../config/index';
+
   export default {
     name: 'ProblemSet',
     data() {
       return {
-        noVerticalBorder:false,
+        url: server.url + '/api/problem',
+        userUrl: server.url + '/api/user',
+        noVerticalBorder: false,
+        passProblems: [],
         tableData: [
-          {"isWritten": true, "index":1,"title": "两数之和", "passRate": "50", "difficultLevel": "0","url":"#/problem"},
-          {"isWritten": false,"index":2, "title": "两数相加", "passRate": "38", "difficultLevel": "1","url":"www.baidu.com"},
-          {"isWritten": true, "index":3,"title": "无重复字符的最长子串", "passRate": "16", "difficultLevel": "2","url":"www.baidu.com"},
-          {"isWritten": false,"index":4, "title": "删除链表的倒数第N个节点", "passRate": "13", "difficultLevel": "0","url":"www.baidu.com"},
-          {"isWritten": false,"index":5, "title": "与所有单词相关联的字串", "passRate": "18", "difficultLevel": "2","url":"www.baidu.com"}
+          {"isWritten": true, "pid": "1", "pname": "两数之和", "passRate": "50", "difficulty": "0"},
+          {"isWritten": false, "pid": "2", "pname": "两数相加", "passRate": "38", "difficulty": "1"},
+          {"isWritten": true, "pid": "3", "pname": "无重复字符的最长子串", "passRate": "16", "difficulty": "2"},
+          {"isWritten": false, "pid": "4", "pname": "删除链表的倒数第N个节点", "passRate": "13", "difficulty": "0"},
+          {"isWritten": false, "pid": "5", "pname": "与所有单词相关联的字串", "passRate": "18", "difficulty": "2"}
         ],
         columns: [
 
@@ -38,21 +44,30 @@
             componentName: 'is-written-cell',
             isResize: true
           },
-          {field: 'index', title: '#', width: 10, titleAlign: 'left', columnAlign: 'left', isResize: true},
+          {field: 'pid', title: '#', width: 10, titleAlign: 'left', columnAlign: 'left', isResize: true},
           {
-            field: 'title',
+            field: 'pname',
             title: '题名',
             width: 300,
             titleAlign: 'left',
             columnAlign: 'left',
             isResize: true,
-            formatter: function (rowData,rowIndex,pagingIndex,field) {
-              return '<a style="color:#08c;text-decoration: none;"  href="'+rowData.url+'">' + rowData.title + '</a>'
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              return '<a style="color:#08c;text-decoration: none;"  href="#/problem/' + rowData.pid + '">' + rowData.pname + '</a>'
             },
           },
-          {field: 'passRate', title: '通过率', width: 50, titleAlign: 'left', columnAlign: 'left', isResize: true},
           {
-            field: 'difficultLevel',
+            field: 'passRate',
+            title: '通过率', width: 50,
+            titleAlign: 'left',
+            columnAlign: 'left',
+            isResize: true,
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              return '<span>' + rowData.passRate + "%" + '</span>'
+            },
+          },
+          {
+            field: 'difficulty',
             title: '难度',
             width: 50,
             titleAlign: 'center',
@@ -63,6 +78,63 @@
 
         ]
       }
+    },
+    mounted() {
+      this.passProblems = [];
+      this.tableData = [];
+      axios.get(this.userUrl + "/" + this.$store.state.user.uid).then(response => {
+          if (response.status !== 200) {
+            throw response;
+          }
+          else {
+            this.passProblems = response.data.passProblem;
+            if (this.tableData.length !== 0) {
+              for (let i = 0; i < this.tableData.length; i++) {
+                this.tableData[i].isWritten = (this.passProblems.indexOf(this.tableData[i].pid) !== -1);
+              }
+            }
+          }
+        }
+      ).catch((error) => {
+        if (error.response) {
+          this.$message.error('未知错误');
+        }
+        else {
+          console.log(error);
+        }
+      });
+
+      axios.get(this.url).then(response => {
+          if (response.status !== 200) {
+            throw response;
+          }
+          else {
+            // console.log(response);
+            let results = response.data;
+            for (let i = 0; i < results.length; i++) {
+              let tmp = results[i];
+              if (results[i].submitCount === 0)
+                tmp.passRate = 0;
+              else
+                tmp.passRate = results[i].passCount / results[i].submitCount;
+              this.tableData.push(tmp);
+            }
+            if (this.passProblems.length !== 0) {
+              for (let i = 0; i < this.tableData.length; i++) {
+                this.tableData[i].isWritten =  (this.passProblems.indexOf(this.tableData[i].pid) !== -1);
+              }
+            }
+
+          }
+        }
+      ).catch((error) => {
+        if (error.response) {
+          this.$message.error('未知错误');
+        }
+        else {
+          console.log(error);
+        }
+      });
     }
   }
 
@@ -75,19 +147,19 @@
         <el-tag v-if="danger" type="danger">困难</el-tag>
         </span>`,
     props: {
-      rowData:{
-        type:Object
+      rowData: {
+        type: Object
       },
     },
-    computed:{
-      success:function () {
-        return this.rowData.difficultLevel === "0";
+    computed: {
+      success: function () {
+        return this.rowData.difficulty === 0;
       },
-      warning:function () {
-        return this.rowData.difficultLevel === "1";
+      warning: function () {
+        return this.rowData.difficulty === 1;
       },
-      danger:function () {
-        return this.rowData.difficultLevel === "2";
+      danger: function () {
+        return this.rowData.difficulty === 2;
       }
     },
   })
@@ -98,12 +170,12 @@
         <i v-if="isWritten" class="el-icon-check" style="color: #67C23A"></i>
         </span>`,
     props: {
-      rowData:{
-        type:Object
+      rowData: {
+        type: Object
       },
     },
-    computed:{
-      isWritten:function () {
+    computed: {
+      isWritten: function () {
         return this.rowData.isWritten;
       },
 

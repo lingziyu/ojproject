@@ -9,10 +9,10 @@ import router from './router/index'
 import 'vue-easytable/libs/themes-base/index.css'
 // 导入 table
 import {VTable} from 'vue-easytable'
+import store from './store.js'
 
 // 注册到全局
 Vue.component(VTable.name, VTable)
-
 Vue.use(ElementUI);
 Vue.config.productionTip = false
 
@@ -20,8 +20,9 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>',
   render: h => h(App)
-})
+});
 

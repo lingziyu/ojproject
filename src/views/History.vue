@@ -14,8 +14,7 @@
     name: 'history',
     components: {
       MyProblemSet,
-      MyHeader,
-
+      MyHeader
     }
   }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="my-problem-set" >
+  <div class="my-problem-set">
     <v-table
       is-horizontal-resize
       style="width:100%"
@@ -14,57 +14,153 @@
 </template>
 
 <script>
-  import Vue from 'vue'
+  import axios from '../axios/http';
+  import server from '../../config/index';
+
   export default {
     name: 'MyProblemSet',
     data() {
       return {
-        noVerticalBorder:false,
+        url: server.url + '/api/result',
+        noVerticalBorder: false,
         tableData: [
-          {"time": "2 小时，55 分钟","title": "两数之和", "state": "通过", "runTime": 165,"language":"cpp","url":"http://www.baidu.com"},
-          {"time": "1 小时，55 分钟", "title": "两数相加", "state": "通过", "runTime": 33,"language":"cpp","url":"www.baidu.com"},
-          {"time": "3 小时，55 分钟","title": "无重复字符的最长子串", "state": "不通过", "runTime": 23,"language":"cpp","url":"www.baidu.com"},
-          {"time": "2 小时，55 分钟","title": "删除链表的倒数第N个节点", "state": "没通过", "runTime": 323,"language":"cpp","url":"www.baidu.com"},
-          {"time": "2 小时，55 分钟","title": "与所有单词相关联的字串", "state": "通过", "runTime": 233,"language":"cpp","url":"www.baidu.com"}
+          {
+            "submitTime": "2 小时，55 分钟",
+            "pname": "两数之和",
+            "status": 4,
+            "time": 165,
+            "language": "cpp",
+            "pid": "1"
+          },
+          {
+            "submitTime": "1 小时，55 分钟",
+            "pname": "两数相加",
+            "status": 3,
+            "time": 33,
+            "language": "cpp",
+            "pid": "1"
+          },
+          {
+            "submitTime": "3 小时，55 分钟",
+            "pname": "无重复字符的最长子串",
+            "status": 3,
+            "time": 23,
+            "language": "cpp",
+            "pid": "1"
+          },
+          {
+            "submitTime": "2 小时，55 分钟",
+            "pname": "删除链表的倒数第N个节点",
+            "status": 3,
+            "time": 323,
+            "language": "cpp",
+            "pid": "1"
+          },
+          {
+            "submitTime": "2 小时，55 分钟",
+            "pname": "与所有单词相关联的字串",
+            "status": 4,
+            "time": 233,
+            "language": "cpp",
+            "pid": "1"
+          }
         ],
         columns: [
 
 
-          {field: 'time', title: '提交时间', width: 200, titleAlign: 'center', columnAlign: 'center', isResize: true},
+          {field: 'submitTime', title: '提交时间', width: 200, titleAlign: 'center', columnAlign: 'center', isResize: true},
           {
-            field: 'title',
+            field: 'pname',
             title: '题名',
             width: 300,
             titleAlign: 'left',
             columnAlign: 'left',
             isResize: true,
-            formatter: function (rowData,rowIndex,pagingIndex,field) {
-              return '<a style="color:#08c;text-decoration: none;"  href="'+rowData.url+'">' + rowData.title + '</a>'
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              return '<a style="color:#08c;text-decoration: none;"  href="' + '#/problem/' + rowData.pid + '">' + rowData.pname + '</a>'
             },
           },
-          {field: 'state',
+          {
+            field: 'status',
             title: '状态',
             width: 50,
             titleAlign: 'left',
             columnAlign: 'left',
-            formatter: function (rowData,rowIndex,pagingIndex,field) {
-              let color = "#F56C6C";
-              if(rowData.state === "通过"){
-                color = "#67C23A";
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              let color = "#67C23A";
+              if (rowData.status === 4) {
+                color = "#F56C6C";
               }
-              return '<span style="color:'+color+'">' + rowData.state + '</span>'
+              let status = "";
+              switch(rowData.status){
+                case 0:
+                  status = "编译中";break;
+                case 1:
+                  status = "运行中";break;
+                case 2:
+                  status = "等待中";break;
+                case 3:
+                  status = "通过";break;
+                case 4:
+                  status = "不通过";break;
+              }
+              return '<span style="color:' + color + '">' + status + '</span>'
             },
-            isResize: true},
-          {field: 'runTime', title: '执行用时', width: 50, titleAlign: 'left', columnAlign: 'left', isResize: true,
-            formatter: function (rowData,rowIndex,pagingIndex,field) {
-              return '<span>' + rowData.runTime +" ms" + '</span>'
+            isResize: true
+          },
+          {
+            field: 'time', title: '执行用时', width: 50, titleAlign: 'left', columnAlign: 'left', isResize: true,
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              return '<span>' + rowData.time + " ms" + '</span>'
             }
           },
-          {field: 'language', title: '语言', width: 50, titleAlign: 'left', columnAlign: 'left', isResize: true},
-
-
+          {
+            field: 'time', title: '使用空间', width: 50, titleAlign: 'left', columnAlign: 'left', isResize: true,
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              return '<span>' + rowData.memory + " B" + '</span>'
+            }
+          },
+          {
+            field: 'language', title: '语言', width: 50, titleAlign: 'left', columnAlign: 'left', isResize: true,
+            formatter: function (rowData, rowIndex, pagingIndex, field) {
+              let Language = "";
+              switch(rowData.language){
+                case 0:
+                  Language = "C";break;
+                case 1:
+                  Language = "C++";break;
+                case 2:
+                  Language = "JAVA";break;
+              }
+              return '<span>' + Language + '</span>'
+            }
+          },
         ]
       }
+    },
+    mounted() {
+      axios.get(this.url + '/' + this.$store.state.user.uid).then(response => {
+          if (response.status !== 200) {
+            throw response;
+          }
+          else {
+            console.log(response);
+            let results = response.data;
+            this.tableData = [];
+            for(let i = 0; i < results.length;i++){
+              this.tableData.push(results[i]);
+            }
+
+          }
+        }
+      ).catch((error) => {
+        if (error.response) {
+          this.$message.error('未知错误');
+        }
+        else {
+          console.log(error);
+        }
+      });
     }
   }
 
