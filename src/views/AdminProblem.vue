@@ -2,7 +2,7 @@
   <div class="admin-problem">
     <my-header activeIndex="/"></my-header>
     <h1 class="title">编辑题目</h1>
-    <el-form class="form" :model="elForm">
+    <el-form class="form" :model="elForm" label-position="top">
       <el-form-item label="标题">
         <el-input v-model="elForm.pname"></el-input>
       </el-form-item>
@@ -11,6 +11,16 @@
       </el-form-item>
       <el-form-item label="实例">
         <el-input type="textarea" :rows="4" v-model="elForm.tips"></el-input>
+      </el-form-item>
+      <el-form-item label="难度">
+        <el-select v-model="elForm.value" placeholder="请选择">
+          <el-option
+            v-for="item in difficultyOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="测试用例">
         <br>
@@ -52,6 +62,11 @@
           {"input": "1 3", "output": "4"},
           {"input": "3 4", "output": "7"}
         ],
+        difficultyOptions:[
+          {"value" : 0, "label" :"容易"},
+          {"value" : 1, "label" :"中等"},
+          {"value" : 2, "label" :"困难"}
+        ],
         columns: [
           {
             field: 'input', title: '输入', width: 200, titleAlign: 'center', columnAlign: 'center', isEdit: true,
@@ -85,11 +100,10 @@
           pname: "",
           tips: "",
           description: "",
+          value: 0
         },
         url: server.url + '/api/problem',
-        resultUrl: server.url + '/api/result',
-        codeUrl: server.url + '/api/code',
-        value: 1,
+        codeUrl: server.url + '/api/testCase',
       }
     },
 
@@ -119,23 +133,28 @@
 
       },
       onSubmit: function () {
+        let inputs = [];
+        let outputs = [];
+        for(let i = 0; i < this.caseTable.length;i++){
+          inputs.push(this.caseTable[i].input);
+          outputs.push(this.caseTable[i].output);
+        }
         let msg = {
-          "uid": this.$store.state.user.uid,
           "pid": this.$route.params.pid,
           "pname": this.elForm.pname,
-          "code": this.code,
-          "result": "",
-          "status": 0, //0是编译中，1是运行中，2是等待中，3是运行成功，4是运行失败
-          "time": 0,
-          "language": this.value, //0是C语言，1是C++，2是JAVA
-          "memory": 0
+          "description": this.elForm.description,
+          "tips": this.elForm.tips,
+          "difficulty": this.elForm.value,
+          "inputs" : inputs,
+          "outputs" : outputs
         };
-        axios.post(this.resultUrl, msg).then(response => {
+        axios.put(this.url, msg).then(response => {
             if (response.status !== 200) {
               throw response;
             }
             else {
-              this.$message('编译中');
+              this.$message('更新成功');
+              this.$router.push('/adminhome')
             }
           }
         ).catch((error) => {
@@ -157,6 +176,17 @@
             this.elForm.pname = response.data.pname;
             this.elForm.description = response.data.description;
             this.elForm.tips = response.data.tips;
+            this.elForm.value = response.data.difficulty;
+            let inputs = response.data.inputs;
+            let outputs = response.data.outputs;
+            this.caseTable = [];
+            for(let i = 0; i < inputs.length; i++){
+              let tmp = {
+                "input" : inputs[i],
+                "output" : outputs[i]
+              };
+              this.caseTable.push(tmp);
+            }
           }
         }
       ).catch((error) => {

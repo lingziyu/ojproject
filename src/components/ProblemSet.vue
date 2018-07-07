@@ -89,53 +89,48 @@
           }
           else {
             this.passProblems = response.data.passProblem;
-            if (this.tableData.length !== 0) {
+          }
+        }
+      ).catch((error) => {
+        if (error.response) {
+          this.$message.error('未知错误');
+        }
+        else {
+          console.log(error);
+        }
+      });
+
+      setTimeout(() => {
+        axios.get(this.url).then(response => {
+            if (response.status !== 200) {
+              throw response;
+            }
+            else {
+              // console.log(response);
+              let results = response.data;
+              for (let i = 0; i < results.length; i++) {
+                let tmp = results[i];
+                if (results[i].submitCount === 0)
+                  tmp.passRate = 0;
+                else
+                  tmp.passRate = results[i].passCount / results[i].submitCount;
+                this.tableData.push(tmp);
+              }
               for (let i = 0; i < this.tableData.length; i++) {
                 this.tableData[i].isWritten = (this.passProblems.indexOf(this.tableData[i].pid) !== -1);
               }
+
             }
           }
-        }
-      ).catch((error) => {
-        if (error.response) {
-          this.$message.error('未知错误');
-        }
-        else {
-          console.log(error);
-        }
-      });
-
-      axios.get(this.url).then(response => {
-          if (response.status !== 200) {
-            throw response;
+        ).catch((error) => {
+          if (error.response) {
+            this.$message.error('未知错误');
           }
           else {
-            // console.log(response);
-            let results = response.data;
-            for (let i = 0; i < results.length; i++) {
-              let tmp = results[i];
-              if (results[i].submitCount === 0)
-                tmp.passRate = 0;
-              else
-                tmp.passRate = results[i].passCount / results[i].submitCount;
-              this.tableData.push(tmp);
-            }
-            if (this.passProblems.length !== 0) {
-              for (let i = 0; i < this.tableData.length; i++) {
-                this.tableData[i].isWritten =  (this.passProblems.indexOf(this.tableData[i].pid) !== -1);
-              }
-            }
-
+            console.log(error);
           }
-        }
-      ).catch((error) => {
-        if (error.response) {
-          this.$message.error('未知错误');
-        }
-        else {
-          console.log(error);
-        }
-      });
+        });
+      }, 100);
     }
   }
 

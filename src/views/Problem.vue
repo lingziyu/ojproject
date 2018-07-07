@@ -92,7 +92,7 @@
           "pname" : this.pname,
           "code" : this.code,
           "result" : "",
-          "status" : 0, //0是编译中，1是运行中，2是等待中，3是运行成功，4是运行失败
+          "status" : 2, //0是编译中，1是运行中，2是等待中，3是运行成功，4是运行失败
           "time" : 0,
           "language" : this.value, //0是C语言，1是C++，2是JAVA
           "memory" : 0
@@ -134,7 +134,26 @@
           console.log(error);
         }
       });
+      axios.get(this.resultUrl + '/latest/'+ this.$store.state.user.uid +'/'+ this.$route.params.pid).then(response => {
+          if (response.status !== 200) {
+            throw response;
+          }
+          else {
+            this.code = response.data.code;
+          }
+        }
+      ).catch((error) => {
+        if (error.response) {
+
+        }
+        else {
+          console.log(error);
+        }
+      });
+
     }
+
+
   }
 </script>
 <style scoped>

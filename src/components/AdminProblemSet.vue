@@ -77,6 +77,33 @@
     },
     methods: {
       addCase(){
+        let pid = parseInt(this.tableData[this.tableData.length - 1].pid) + 1;
+        let msg = {
+          "pid" : pid,
+          "pname" : "新建题目",
+          "difficulty" : 0, //0是简单，1是中等，2是困难
+          "description" : "请添加描述",
+          "tips" : "请添加例子",
+          "passingCount" : 0,
+          "submitCount" : 0,
+          "provider" : "admin"
+        };
+        axios.post(this.url,msg).then(response => {
+            if (response.status !== 200) {
+              throw response;
+            }
+            else {
+              this.$router.push({name: 'AdminProblem', params: {pid: pid}});
+            }
+          }
+        ).catch((error) => {
+          if (error.response) {
+            this.$message.error('未知错误');
+          }
+          else {
+            console.log(error);
+          }
+        });
 
       },
       customCompFunc(params) {
